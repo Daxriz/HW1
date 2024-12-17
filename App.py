@@ -49,13 +49,13 @@ class ShellEmulator:
             self._cur_pos.add_line(str.count("\n") )
 
                       
-    #Íàñòðîéêà îêíà ïðèëîæåíèÿ
+    #Настройка окна приложения
     def configWindow(self):
         self._window.title("Shell Emulator")
         self._command_input = tk.Text(master=self._window)
         self._command_input.insert(tk.END, self._ps1)
 
-    #Îáðàáîòêà Enter
+    #Обработка Enter
     def _bindings(self):
         def handle_keypress(event):
             if event.keysym == "Return":
@@ -63,11 +63,11 @@ class ShellEmulator:
 
         self._window.bind("<Key>", handle_keypress)
     
-    #Ðàçìåùåíèå òåêñòîâîãî ïîëÿ â îêíå
+    #Размещение текстового поля в окне
     def _pack(self):
         self._command_input.pack()
 
-    #Ëîãèðîâàíèå
+    #Логирование
     def log_action(self, command):
         now = datetime.now()
         log_entry = ET.Element("entry")
@@ -75,7 +75,7 @@ class ShellEmulator:
         ET.SubElement(log_entry, "user").text = self._username
         ET.SubElement(log_entry, "command").text = command
 
-        # Ñîçäàíèå èëè çàãðóçêà ñóùåñòâóþùåãî ëîãà
+        # Создание или загрузка существующего лога
         if os.path.exists(self._log_path):
             tree = ET.parse(self._log_path)
             root = tree.getroot()
@@ -84,11 +84,11 @@ class ShellEmulator:
         
         root.append(log_entry)
 
-        # Ñîõðàíåíèå ëîãà
+        # Сохранение лога
         tree = ET.ElementTree(root)
         tree.write(self._log_path)
 
-    #Ñ÷èòûâàíèå è îáðàáîòêà êîìàíä
+    #Считывание и обработка команд
     def _execute(self):
         cmd = self._command_input.get(self._cur_pos.to_str(), tk.END)[:-2]
         args = cmd.split()
@@ -102,13 +102,13 @@ class ShellEmulator:
             elif args[0] == "exit":
                 self.exit()
             elif args[0] == "clear":
-                self.clear(self._command_input)  # Èñïðàâëåíî íà ïðàâèëüíûé âûçîâ
+                self.clear(self._command_input)  # Исправлено на правильный вызов
             elif args[0] == "pwd":
                 self._print(self.pwd() + "\n")
             elif args[0] == "rmdir":
-                self._print(self.rmdir(args[1:]))  # Ïåðåäàåì àðãóìåíòû â rmdir
+                self._print(self.rmdir(args[1:]))  # Передаем аргументы в rmdir
             else:
-                self._print("Íåèçâåñòíàÿ êîìàíäà\n")
+                self._print("Неизвестная команда\n")
 
         self._print(self._ps1)
         self._cur_pos.add_line(1)
@@ -129,7 +129,7 @@ class ShellEmulator:
         result = sorted(file_set)
         if result:
             return '\n'.join(result) + '\n'
-        return 'Äèðåêòîðèÿ íå ñîäåðæèò ôàéëû èëè íå ñóùåñòâóåò\n'
+        return 'Директория не содержит файлы или не существует\n'
 
     def cd(self, args):
         if not args:
@@ -152,7 +152,7 @@ class ShellEmulator:
                 self._cur_path = target_path
                 return ''
         
-        return "Íåêîððåêòíûé ïóòü\n"
+        return "Некорректный путь\n"
 
     def exit(self):
         self._window.destroy()
@@ -162,21 +162,21 @@ class ShellEmulator:
         return self._cur_path
 
     def clear(self, text_area):
-        text_area.delete(1.0, tk.END)  # Î÷èùàåì òåêñòîâîå ïîëå
+        text_area.delete(1.0, tk.END)  # Очищаем текстовое поле
         self.log_action('clear')
 
     def rmdir(self, args):
         if not args:
-            return "Íå óêàçàíà äèðåêòîðèÿ äëÿ óäàëåíèÿ\n"
+            return "Не указана директория для удаления\n"
         
         path = args[0]
         full_path = os.path.join(self._cur_path, path)
         try:
-            os.rmdir(full_path)  # Óäàëÿåì êàòàëîã
+            os.rmdir(full_path)  # Удаляем каталог
             self.log_action(f'rmdir: {full_path}')
-            return f'Êàòàëîã {full_path} óñïåøíî óäàëåí\n'
+            return f'Каталог {full_path} успешно удален\n'
         except OSError as e:
-            return f"Îøèáêà ïðè óäàëåíèè êàòàëîãà: {e}\n"
+            return f"Ошибка при удалении каталога: {e}\n"
 
     def resolve_path(self, target_path):
         if target_path[0] == '/':
