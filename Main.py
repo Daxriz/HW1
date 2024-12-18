@@ -37,7 +37,7 @@ while True:
         break
 
 
-            handler.execute(command)
+        handler.execute(command)
         except KeyboardInterrupt:
             print("\nЗавершение работы...")
             break
