@@ -1,5 +1,5 @@
 import unittest
-from file_system import VirtualFileSystem
+from vr import VirtualFileSystem  # Импортируем из vr.py
 
 class TestVirtualFileSystem(unittest.TestCase):
     def setUp(self):
