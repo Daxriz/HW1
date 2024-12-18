@@ -1,31 +1,17 @@
-import pytest
-from emulator import ShellEmulator
-from unittest.mock import patch, MagicMock
+import unittest
+from file_system import VirtualFileSystem
 
-# Тестируем команды
-@pytest.fixture
-def emulator():
-    return ShellEmulator("test_host", "test.zip", "log.json")
+class TestVirtualFileSystem(unittest.TestCase):
+    def setUp(self):
+        self.vfs = VirtualFileSystem("tests/test_fs.zip")
 
-def test_ls(emulator):
-    with patch("builtins.input", return_value="ls"):
-        with patch("builtins.print") as mocked_print:
-            emulator.run()
-            mocked_print.assert_called_with("file1.txt")
-    
-def test_cd(emulator):
-    with patch("builtins.input", return_value="cd /folder"):
-        emulator.run()
-        assert emulator.current_dir == "/folder"
+    def test_list_dir(self):
+        result = self.vfs.list_dir("/")
+        self.assertIn("dir1", result)
 
-def test_pwd(emulator):
-    with patch("builtins.input", return_value="pwd"):
-        with patch("builtins.print") as mocked_print:
-            emulator.run()
-            mocked_print.assert_called_with("/")
+    def test_change_dir(self):
+        self.vfs.change_dir("/dir1")
+        self.assertEqual(self.vfs.current_path, "/dir1/")
 
-def test_rmdir(emulator):
-    with patch("builtins.input", return_value="rmdir folder"):
-        with patch("builtins.print") as mocked_print:
-            emulator.run()
-            mocked_print.assert_called_with("rmdir: removed folder")
+if __name__ == "__main__":
+    unittest.main()
