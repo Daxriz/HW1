@@ -1,5 +1,7 @@
-import os
 import sys
+import os
+from vr import VirtualFileSystem
+from logger import Logger
 
 class CommandHandler:
     def __init__(self, vfs, logger):
@@ -7,7 +9,6 @@ class CommandHandler:
         self.logger = logger
 
     def execute(self, command):
-        """Исполнение команды оболочки"""
         args = command.split()
         if not args:
             return
