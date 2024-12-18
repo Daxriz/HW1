@@ -1,25 +1,44 @@
-import argparse
-from gui import ShellGUI
+import sys
+import zipfile
+import os
+import json
+from file_system import VirtualFileSystem
+from commands import CommandHandler
 from logger import Logger
-from virtual_fs import VirtualFileSystem
-from shell_emulator import ShellEmulator
 
 def main():
-    parser = argparse.ArgumentParser(description="Shell Emulator")
-    parser.add_argument("--hostname", required=True, help="Computer hostname for shell prompt")
-    parser.add_argument("--fs", required=True, help="Path to virtual filesystem ZIP archive")
-    parser.add_argument("--log", required=True, help="Path to log file")
+    # Обработка аргументов командной строки
+    if len(sys.argv) != 4:
+        print("Использование: python main.py <имя компьютера> <путь к архиву> <путь к лог-файлу>")
+        sys.exit(1)
 
-    args = parser.parse_args()
+    computer_name = sys.argv[1]
+    zip_path = sys.argv[2]
+    log_path = sys.argv[3]
 
-    # Initialize components
-    logger = Logger(args.log)
-    vfs = VirtualFileSystem(args.fs)
-    shell = ShellEmulator(args.hostname, vfs, logger)
+    # Проверка существования файла zip
+    if not os.path.isfile(zip_path):
+        print("Ошибка: Файл виртуальной файловой системы не найден.")
+        sys.exit(1)
 
-    # Start GUI
-    gui = ShellGUI(shell)
-    gui.run()
+    # Инициализация компонентов
+    logger = Logger(log_path)
+    vfs = VirtualFileSystem(zip_path)
+    handler = CommandHandler(vfs, logger)
+
+    # Эмуляция оболочки
+    print(f"Добро пожаловать в эмулятор оболочки [{computer_name}]!")
+    while True:
+        try:
+            command = input(f"{computer_name}> ").strip()
+            if command == "exit":
+                print("Завершение работы...")
+                break
+
+            handler.execute(command)
+        except KeyboardInterrupt:
+            print("\nЗавершение работы...")
+            break
 
 if __name__ == "__main__":
     main()
