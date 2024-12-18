@@ -1,38 +1,54 @@
-class ShellEmulator:
-    def __init__(self, hostname, vfs, logger):
-        self.hostname = hostname
+import os
+import sys
+
+class CommandHandler:
+    def __init__(self, vfs, logger):
         self.vfs = vfs
         self.logger = logger
-        self.current_dir = "/"
 
     def execute(self, command):
-        self.logger.log(f"Executing command: {command}")
-        parts = command.strip().split()
-        if not parts:
-            return ""
+        args = command.split()
+        if not args:
+            return
 
-        cmd = parts[0]
-        args = parts[1:]
+        cmd = args[0]
 
         if cmd == "ls":
-            return self.vfs.list_directory(self.current_dir)
+            result = self.vfs.list_dir(self.vfs.current_path)
+            print("\n".join(result) if result else "Пусто.")
+            self.logger.log(command)
+
         elif cmd == "cd":
-            if args:
-                self.current_dir = self.vfs.change_directory(self.current_dir, args[0])
-                return ""
-            else:
-                return "Usage: cd <directory>"
-        elif cmd == "pwd":
-            return self.current_dir
+            path = args[1] if len(args) > 1 else "/"
+            try:
+                self.vfs.change_dir(path)
+                self.logger.log(command)
+            except FileNotFoundError as e:
+                print(e)
+
         elif cmd == "clear":
-            return "[CLEAR_SCREEN]"
+            os.system("cls" if os.name == "nt" else "clear")
+            self.logger.log(command)
+
+        elif cmd == "pwd":
+            print(self.vfs.current_path)
+            self.logger.log(command)
+
         elif cmd == "rmdir":
-            if args:
-                return self.vfs.remove_directory(self.current_dir, args[0])
-            else:
-                return "Usage: rmdir <directory>"
+            if len(args) < 2:
+                print("Укажите путь к директории для удаления.")
+                return
+            try:
+                self.vfs.remove_dir(args[1])
+                print(f"Директория '{args[1]}' удалена.")
+                self.logger.log(command)
+            except FileNotFoundError as e:
+                print(e)
+
         elif cmd == "exit":
-            self.logger.save()
-            exit(0)
+            print("Завершение работы...")
+            self.logger.log(command)
+            sys.exit(0)  # Завершаем выполнение программы
+
         else:
-            return f"Unknown command: {cmd}"
+            print(f"Команда '{cmd}' не найдена.")
