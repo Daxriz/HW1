@@ -7,6 +7,7 @@ from commands import CommandHandler
 from logger import Logger
 
 def main():
+    # Обработка аргументов командной строки
     if len(sys.argv) != 4:
         print("Использование: python main.py <имя компьютера> <путь к архиву> <путь к лог-файлу>")
         sys.exit(1)
@@ -15,7 +16,7 @@ def main():
     zip_path = sys.argv[2]
     log_path = sys.argv[3]
 
-
+    # Проверка существования файла zip
     if not os.path.isfile(zip_path):
         print("Ошибка: Файл виртуальной файловой системы не найден.")
         sys.exit(1)
@@ -31,11 +32,14 @@ def main():
     # Цикл для ввода команд
     while True:
         try:
+            # Ожидаем ввод команды
             command = input(f"{computer_name}> ").strip()
             handler.execute(command)  # Передаем команду на обработку
         except KeyboardInterrupt:
+            # Если произошел KeyboardInterrupt, завершаем цикл
             print("\nЗавершение работы...")
-            break
+            break  # Прерываем цикл
 
+# Важно: функция main() должна быть вызвана при запуске
 if __name__ == "__main__":
     main()
