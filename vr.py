@@ -24,7 +24,10 @@ class VirtualFileSystem:
                 print(f"Found file: {file}, Subpath: {sub_path}")  # Отладочная информация
                 if "/" not in sub_path:  # Если это не подкаталог, то файл или директория
                     result.append(sub_path)
-        return result
+        if result:
+            return result
+        else:
+            return ["Пусто."]  # Если нет файлов, возвращаем "Пусто."
 
     def change_dir(self, path):
         """Меняет текущую директорию на указанную"""
