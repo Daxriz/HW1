@@ -14,6 +14,7 @@ class VirtualFileSystem:
             for file in zip_ref.namelist():
                 self.virtual_fs[file] = None  # Эмуляция содержимого архива
         print("Виртуальная файловая система загружена.")
+        print("Содержимое архива:", self.virtual_fs)
 
     def list_dir(self, path):
         """Возвращает список файлов и директорий в заданной директории"""
@@ -23,7 +24,7 @@ class VirtualFileSystem:
             if file.startswith(path) and file != path:
                 sub_path = file[len(path):].strip("/")
                 print(f"  - {file} (subpath: {sub_path})")  # Отладочная информация
-                if "/" not in sub_path:
+                if "/" not in sub_path:  # Если это не подкаталог, то файл или директория
                     result.append(sub_path)
         if result:
             return result
