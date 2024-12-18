@@ -28,12 +28,14 @@ def main():
 
     # Эмуляция оболочки
     print(f"Добро пожаловать в эмулятор оболочки [{computer_name}]!")
-    while True:
-        try:
-            command = input(f"{computer_name}> ").strip()
-            if command == "exit":
-                print("Завершение работы...")
-                break
+while True:
+    try:
+        command = input(f"{computer_name}> ").strip()
+        handler.execute(command)  # Передаём команду на обработку
+    except KeyboardInterrupt:
+        print("\nЗавершение работы...")
+        break
+
 
             handler.execute(command)
         except KeyboardInterrupt:
