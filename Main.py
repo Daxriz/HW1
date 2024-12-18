@@ -7,7 +7,6 @@ from commands import CommandHandler
 from logger import Logger
 
 def main():
-    # Обработка аргументов командной строки
     if len(sys.argv) != 4:
         print("Использование: python main.py <имя компьютера> <путь к архиву> <путь к лог-файлу>")
         sys.exit(1)
@@ -16,7 +15,7 @@ def main():
     zip_path = sys.argv[2]
     log_path = sys.argv[3]
 
-    # Проверка существования файла zip
+
     if not os.path.isfile(zip_path):
         print("Ошибка: Файл виртуальной файловой системы не найден.")
         sys.exit(1)
