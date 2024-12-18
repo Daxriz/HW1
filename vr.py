@@ -11,16 +11,18 @@ class VirtualFileSystem:
     def load_zip(self):
         """Загрузка содержимого ZIP-архива в виртуальную файловую систему"""
         with zipfile.ZipFile(self.zip_path, 'r') as zip_ref:
+            print("Содержимое архива:", zip_ref.namelist())  # Отладочный вывод
             for file in zip_ref.namelist():
                 self.virtual_fs[file] = None  # Эмуляция содержимого архива
         print("Виртуальная файловая система загружена.")
-        print("Содержимое архива:", self.virtual_fs)
+        print("Содержимое виртуальной файловой системы:", self.virtual_fs)
 
     def list_dir(self, path):
         """Возвращает список файлов и директорий в заданной директории"""
         result = []
         print(f"Список файлов для пути '{path}':")  # Отладочный вывод
         for file in self.virtual_fs:
+            print(f"Проверяем файл: {file}")  # Отладочный вывод
             if file.startswith(path) and file != path:
                 sub_path = file[len(path):].strip("/")
                 print(f"  - {file} (subpath: {sub_path})")  # Отладочная информация
