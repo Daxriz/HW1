@@ -35,11 +35,8 @@ def main():
         except KeyboardInterrupt:
             print("\nЗавершение работы...")
             break
-
-            handler.execute(command)
-        except KeyboardInterrupt:
-            print("\nЗавершение работы...")
-            break
+        except Exception as e:
+            print(f"Ошибка: {e}")
 
 if __name__ == "__main__":
     main()
