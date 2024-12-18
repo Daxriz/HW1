@@ -30,14 +30,15 @@ class VirtualFileSystem:
             return ["Пусто."]  # Если нет файлов, возвращаем "Пусто."
 
     def change_dir(self, path):
-        """Меняет текущую директорию на указанную"""
+    """Меняет текущую директорию на указанную"""
+        print(f"Попытка смены директории на: {path}")  # Отладочный вывод
         if path == "/":
             self.current_path = "/"
         elif any(file.startswith(path) for file in self.virtual_fs):
             self.current_path = path.rstrip("/") + "/"
         else:
             raise FileNotFoundError("Директория не найдена.")
-
+            
     def remove_dir(self, path):
         """Удаляет директорию (удаляет все файлы в ней)"""
         keys_to_remove = [file for file in self.virtual_fs if file.startswith(path)]
