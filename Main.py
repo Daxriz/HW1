@@ -1,4 +1,5 @@
 import sys
+import os  # Добавляем импорт os
 from emulator import CommandHandler
 from vr import VirtualFileSystem
 from logger import Logger
@@ -15,7 +16,7 @@ def main():
 
     # Проверка существования файла zip
     if not os.path.isfile(zip_path):
-        print("Ошибка: Файл виртуальной файловой системы не найден.")
+        print(f"Ошибка: Файл виртуальной файловой системы '{zip_path}' не найден.")
         sys.exit(1)
 
     # Инициализация компонентов
