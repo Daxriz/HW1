@@ -18,32 +18,24 @@ class VirtualFileSystem:
     def list_dir(self, path):
         """Возвращает список файлов и директорий в заданной директории"""
         result = []
+        print(f"Список файлов для пути '{path}':")  # Отладочный вывод
         for file in self.virtual_fs:
             if file.startswith(path) and file != path:
-                sub_path = file[len(path):].strip("/")  # Получаем подкаталог
-                print(f"Found file: {file}, Subpath: {sub_path}")  # Отладочная информация
-                if "/" not in sub_path:  # Если это не подкаталог, то файл или директория
+                sub_path = file[len(path):].strip("/")
+                print(f"  - {file} (subpath: {sub_path})")  # Отладочная информация
+                if "/" not in sub_path:
                     result.append(sub_path)
         if result:
             return result
         else:
-            return ["Пусто."]  # Если нет файлов, возвращаем "Пусто."
-
+            return ["Пусто."]
+    
     def change_dir(self, path):
-    """Меняет текущую директорию на указанную"""
+        """Меняет текущую директорию на указанную"""
         print(f"Попытка смены директории на: {path}")  # Отладочный вывод
         if path == "/":
             self.current_path = "/"
         elif any(file.startswith(path) for file in self.virtual_fs):
             self.current_path = path.rstrip("/") + "/"
-        else:
-            raise FileNotFoundError("Директория не найдена.")
-            
-    def remove_dir(self, path):
-        """Удаляет директорию (удаляет все файлы в ней)"""
-        keys_to_remove = [file for file in self.virtual_fs if file.startswith(path)]
-        if keys_to_remove:
-            for key in keys_to_remove:
-                del self.virtual_fs[key]
         else:
             raise FileNotFoundError("Директория не найдена.")
