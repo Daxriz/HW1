@@ -1,56 +1,85 @@
 import os
+import sys
 import zipfile
 import json
-import tkinter as tk
-from tkinter import messagebox
-from fs_utils import VirtualFileSystem, FileSystemCommandHandler
+from file_system import FileSystem
+from logger import Logger
 
 class ShellEmulator:
-    def __init__(self, hostname, zip_file, log_file):
-        self.hostname = hostname
-        self.vfs = VirtualFileSystem(zip_file)
-        self.log_file = log_file
-        self.command_handler = FileSystemCommandHandler(self.vfs, self.log_file)
-        self.current_dir = "/"
+    def __init__(self, host_name, fs_path, log_path):
+        self.host_name = host_name
+        self.fs_path = fs_path
+        self.log_path = log_path
+        self.fs = FileSystem(self.fs_path)
+        self.logger = Logger(self.log_path)
+        self.current_dir = self.fs.root  # Стартовая директория
+
+    def print_prompt(self):
+        return f"{self.host_name}:{self.current_dir} $ "
 
     def run(self):
-        # Инициализация GUI
-        root = tk.Tk()
-        root.title(f"Shell Emulator - {self.hostname}")
+        while True:
+            try:
+                command = input(self.print_prompt()).strip().lower()
+                if command == "exit":
+                    self.logger.log_command("exit")
+                    break
+                elif command.startswith("cd "):
+                    self.change_directory(command[3:])
+                elif command == "ls":
+                    self.list_directory()
+                elif command == "clear":
+                    self.clear_screen()
+                elif command == "pwd":
+                    self.print_working_directory()
+                elif command.startswith("rmdir "):
+                    self.remove_directory(command[6:])
+                else:
+                    print("Unknown command.")
+            except Exception as e:
+                print(f"Error: {e}")
+                self.logger.log_error(str(e))
 
-        # Окно вывода и ввода команд
-        self.output_text = tk.Text(root, height=20, width=80)
-        self.output_text.pack()
+    def change_directory(self, path):
+        if path == "..":
+            if self.current_dir != self.fs.root:
+                self.current_dir = os.path.dirname(self.current_dir)
+            self.logger.log_command(f"cd {path}")
+        elif self.fs.is_directory(path):
+            self.current_dir = path
+            self.logger.log_command(f"cd {path}")
+        else:
+            print(f"cd: no such file or directory: {path}")
 
-        self.input_entry = tk.Entry(root, width=80)
-        self.input_entry.bind("<Return>", self.process_command)
-        self.input_entry.pack()
+    def list_directory(self):
+        files = self.fs.list_files(self.current_dir)
+        for file in files:
+            print(file)
+        self.logger.log_command("ls")
 
-        # Инициализация интерфейса
-        self.display_prompt()
-        root.mainloop()
+    def clear_screen(self):
+        os.system("clear")
+        self.logger.log_command("clear")
 
-    def process_command(self, event):
-        command = self.input_entry.get().strip()
-        self.input_entry.delete(0, tk.END)
-        if command:
-            output = self.command_handler.execute(command)
-            self.display_output(output)
+    def print_working_directory(self):
+        print(self.current_dir)
+        self.logger.log_command("pwd")
 
-    def display_output(self, output):
-        self.output_text.insert(tk.END, output + '\n')
-        self.display_prompt()
-
-    def display_prompt(self):
-        prompt = f"{self.hostname}:{self.current_dir}$ "
-        self.output_text.insert(tk.END, prompt)
-        self.output_text.yview(tk.END)
+    def remove_directory(self, dir_name):
+        if self.fs.remove_directory(dir_name):
+            print(f"rmdir: removed {dir_name}")
+            self.logger.log_command(f"rmdir {dir_name}")
+        else:
+            print(f"rmdir: failed to remove {dir_name}")
 
 if __name__ == "__main__":
-    # Пример использования
-    emulator = ShellEmulator(
-        hostname="localhost", 
-        zip_file="path/to/virtual_filesystem.zip", 
-        log_file="path/to/log.json"
-    )
+    if len(sys.argv) != 4:
+        print("Usage: python emulator.py <host_name> <fs_zip_path> <log_path>")
+        sys.exit(1)
+
+    host_name = sys.argv[1]
+    fs_path = sys.argv[2]
+    log_path = sys.argv[3]
+    
+    emulator = ShellEmulator(host_name, fs_path, log_path)
     emulator.run()
