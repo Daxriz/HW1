@@ -7,6 +7,7 @@ class CommandHandler:
         self.logger = logger
 
     def execute(self, command):
+        """Исполнение команды оболочки"""
         args = command.split()
         if not args:
             return
