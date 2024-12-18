@@ -1,36 +1,31 @@
-import unittest
-from fs_utils import VirtualFileSystem, FileSystemCommandHandler
-import os
+import pytest
+from emulator import ShellEmulator
+from unittest.mock import patch, MagicMock
 
-class TestShellEmulator(unittest.TestCase):
+# Тестируем команды
+@pytest.fixture
+def emulator():
+    return ShellEmulator("test_host", "test.zip", "log.json")
 
-    def setUp(self):
-        self.vfs = VirtualFileSystem("test_files.zip")
-        self.command_handler = FileSystemCommandHandler(self.vfs, "log.json")
+def test_ls(emulator):
+    with patch("builtins.input", return_value="ls"):
+        with patch("builtins.print") as mocked_print:
+            emulator.run()
+            mocked_print.assert_called_with("file1.txt")
+    
+def test_cd(emulator):
+    with patch("builtins.input", return_value="cd /folder"):
+        emulator.run()
+        assert emulator.current_dir == "/folder"
 
-    def test_ls_valid(self):
-        result = self.command_handler.ls(['/'])
-        self.assertIn('somefile.txt', result)  # Предполагается наличие файла в корне
+def test_pwd(emulator):
+    with patch("builtins.input", return_value="pwd"):
+        with patch("builtins.print") as mocked_print:
+            emulator.run()
+            mocked_print.assert_called_with("/")
 
-    def test_ls_invalid_directory(self):
-        result = self.command_handler.ls(['/nonexistent'])
-        self.assertIn("Directory /nonexistent not found", result)
-
-    def test_cd_valid(self):
-        result = self.command_handler.cd(['/valid_dir'])
-        self.assertIn("Changed directory to", result)
-
-    def test_cd_invalid(self):
-        result = self.command_handler.cd(['/nonexistent_dir'])
-        self.assertIn("Directory /nonexistent_dir not found", result)
-
-    def test_rmdir_valid(self):
-        result = self.command_handler.rmdir(['/empty_dir'])
-        self.assertIn("Directory /empty_dir removed", result)
-
-    def test_rmdir_invalid(self):
-        result = self.command_handler.rmdir(['/non_empty_dir'])
-        self.assertIn("Directory /non_empty_dir not found", result)
-
-if __name__ == "__main__":
-    unittest.main()
+def test_rmdir(emulator):
+    with patch("builtins.input", return_value="rmdir folder"):
+        with patch("builtins.print") as mocked_print:
+            emulator.run()
+            mocked_print.assert_called_with("rmdir: removed folder")
