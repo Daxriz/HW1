@@ -1,30 +1,44 @@
+import sys
 import zipfile
 import os
-import io
+import json
+from file_system import VirtualFileSystem
+from commands import CommandHandler
+from logger import Logger
 
-class FileSystem:
-    def __init__(self, zip_path):
-        self.zip_path = zip_path
-        self.files = self.load_filesystem(zip_path)
-        self.root = "/"
+def main():
+    # Обработка аргументов командной строки
+    if len(sys.argv) != 4:
+        print("Использование: python main.py <имя компьютера> <путь к архиву> <путь к лог-файлу>")
+        sys.exit(1)
 
-    def load_filesystem(self, zip_path):
-        files = {}
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            for file in zip_ref.namelist():
-                files[file] = zip_ref.read(file)
-        return files
+    computer_name = sys.argv[1]
+    zip_path = sys.argv[2]
+    log_path = sys.argv[3]
 
-    def is_directory(self, path):
-        # Простейшая проверка: если директория существует в архиве
-        return path in self.files
+    # Проверка существования файла zip
+    if not os.path.isfile(zip_path):
+        print("Ошибка: Файл виртуальной файловой системы не найден.")
+        sys.exit(1)
 
-    def list_files(self, dir_path):
-        return [file for file in self.files if file.startswith(dir_path)]
+    # Инициализация компонентов
+    logger = Logger(log_path)
+    vfs = VirtualFileSystem(zip_path)
+    handler = CommandHandler(vfs, logger)
 
-    def remove_directory(self, dir_name):
-        # Удаляем только пустую директорию
-        if dir_name in self.files:
-            del self.files[dir_name]
-            return True
-        return False
+    # Эмуляция оболочки
+    print(f"Добро пожаловать в эмулятор оболочки [{computer_name}]!")
+    while True:
+        try:
+            command = input(f"{computer_name}> ").strip()
+            if command == "exit":
+                print("Завершение работы...")
+                break
+
+            handler.execute(command)
+        except KeyboardInterrupt:
+            print("\nЗавершение работы...")
+            break
+
+if __name__ == "__main__":
+    main()
