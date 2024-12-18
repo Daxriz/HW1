@@ -7,6 +7,6 @@ class Logger:
 
     def log(self, command):
         log_entry = {"command": command}
-        with open(self.log_path, "a") as log_file:
-            json.dump(log_entry, log_file)
+        with open(self.log_path, "a", encoding="utf-8") as log_file:
+            json.dump(log_entry, log_file, ensure_ascii=False)
             log_file.write("\n")
