@@ -1,9 +1,6 @@
 import sys
-import zipfile
-import os
-import json
-from vr import VirtualFileSystem  
-from emulator import CommandHandler  
+from emulator import CommandHandler
+from vr import VirtualFileSystem
 from logger import Logger
 
 def main():
@@ -35,8 +32,6 @@ def main():
         except KeyboardInterrupt:
             print("\nЗавершение работы...")
             break
-        except Exception as e:
-            print(f"Ошибка: {e}")
 
 if __name__ == "__main__":
     main()
