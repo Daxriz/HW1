@@ -21,6 +21,7 @@ class VirtualFileSystem:
         for file in self.virtual_fs:
             if file.startswith(path) and file != path:
                 sub_path = file[len(path):].strip("/")  # Получаем подкаталог
+                print(f"Found file: {file}, Subpath: {sub_path}")  # Отладочная информация
                 if "/" not in sub_path:  # Если это не подкаталог, то файл или директория
                     result.append(sub_path)
         return result
