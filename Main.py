@@ -28,18 +28,18 @@ def main():
 
     # Эмуляция оболочки
     print(f"Добро пожаловать в эмулятор оболочки [{computer_name}]!")
-
-    # Цикл для ввода команд
     while True:
         try:
-            # Ожидаем ввод команды
             command = input(f"{computer_name}> ").strip()
-            handler.execute(command)  # Передаем команду на обработку
+            handler.execute(command)  # Передаём команду на обработку
         except KeyboardInterrupt:
-            # Если произошел KeyboardInterrupt, завершаем цикл
             print("\nЗавершение работы...")
-            break  # Прерываем цикл
+            break
 
-# Важно: функция main() должна быть вызвана при запуске
+            handler.execute(command)
+        except KeyboardInterrupt:
+            print("\nЗавершение работы...")
+            break
+
 if __name__ == "__main__":
     main()
