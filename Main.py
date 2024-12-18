@@ -2,8 +2,8 @@ import sys
 import zipfile
 import os
 import json
-from vr import VirtualFileSystem
-from emulator import CommandHandler
+from vr import VirtualFileSystem  
+from emulator import CommandHandler  
 from logger import Logger
 
 def main():
